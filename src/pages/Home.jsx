@@ -21,6 +21,7 @@ const Home = () => {
         ]);
 
         const combinedProducts = [...menResponse.data, ...womenResponse.data];
+        console.log("Combined Products:", combinedProducts);
         const shuffledProducts = combinedProducts.sort(
           () => Math.random() - 0.5
         );

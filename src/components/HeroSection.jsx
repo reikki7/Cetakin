@@ -78,7 +78,7 @@ const HeroCarousel = () => {
                 className="absolute inset-0 bg-[#8DA291]"
                 style={{
                   clipPath: "polygon(0 0, 70% 0, 50% 100%, 0 100%)",
-                  "@media (min-width: 768px)": {
+                  "@media (minWidth: 768px)": {
                     clipPath: "polygon(0 0, 60% 0, 40% 100%, 0 100%)",
                   },
                 }}
@@ -92,7 +92,7 @@ const HeroCarousel = () => {
                 style={{
                   backgroundImage: `url(${slide.image})`,
                   clipPath: "polygon(50% 0, 100% 0, 100% 100%, 70% 100%)",
-                  "@media (min-width: 768px)": {
+                  "@media (minWidth: 768px)": {
                     clipPath: "polygon(40% 0, 100% 0, 100% 100%, 60% 100%)",
                   },
                 }}
