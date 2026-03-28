@@ -1,16 +1,35 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { IoCartOutline } from "react-icons/io5";
+import { formatCurrency } from "../utils/currency";
 import { IoMdHeart, IoMdHeartEmpty } from "react-icons/io";
+import { useWishlist } from "../contexts/WishlistContext";
 
-const ProductCard = ({ product }) => {
-  const [isWishlisted, setIsWishlisted] = useState(false);
+const ProductCard = ({
+  product,
+  showOriginalPrice,
+  showRating,
+  showSoldCount,
+  showDiscount,
+}) => {
+  const { isInWishlist, addToWishlist, removeFromWishlist } = useWishlist();
   const [imageError, setImageError] = useState(false);
   const navigate = useNavigate();
 
+  const isWishlisted = isInWishlist(product.id);
+
   const handleWishlistToggle = (e) => {
     e.stopPropagation();
-    setIsWishlisted(!isWishlisted);
+    if (isWishlisted) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist({
+        id: product.id,
+        title: product.title,
+        image: product.image || product.image_url, // Handle both image properties
+        price: product.displayed_price_final || product.price, // Use consistent price
+        category: product.category,
+      });
+    }
   };
 
   const handleImageError = () => {
@@ -29,24 +48,24 @@ const ProductCard = ({ product }) => {
   return (
     <div
       onClick={handleProductClick}
-      className="group relative bg-white border border-gray-100 rounded-lg overflow-hidden hover:shadow-lg hover:border-gray-200 transition-all duration-300 ease-in-out transform hover:-translate-y-1 cursor-pointer"
+      className="group cursor-pointer bg-white rounded-lg overflow-hidden transition-all duration-200 hover:shadow-md max-w-[260px] w-full"
     >
       {/* Image Container */}
-      <div className="relative aspect-square overflow-hidden bg-white">
-        {!imageError && product.image ? (
+      <div className="relative aspect-square overflow-hidden">
+        {!imageError && (product.image_url || product.image) ? (
           <img
             src={product.image}
             alt={product.title}
-            className="w-full h-full p-4 sm:p-6 object-contain group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full p-3 object-contain group-hover:scale-105 transition-transform duration-300"
             onError={handleImageError}
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-100">
+          <div className="w-full h-full flex items-center justify-center">
             <div className="text-gray-400 text-center">
-              <div className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2 bg-gray-200 rounded-full flex items-center justify-center">
-                <span className="text-base sm:text-xl">📷</span>
+              <div className="w-10 h-10 mx-auto mb-1 bg-gray-200/50 rounded-full flex items-center justify-center">
+                <span className="text-lg">🎨</span>
               </div>
-              <span className="text-xs sm:text-sm">No Image</span>
+              <span className="text-xs">No Image</span>
             </div>
           </div>
         )}
@@ -54,34 +73,71 @@ const ProductCard = ({ product }) => {
         {/* Wishlist Button */}
         <button
           onClick={handleWishlistToggle}
-          className="absolute top-2 right-2 sm:top-3 sm:right-3 w-6 h-6 sm:w-8 sm:h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-white hover:scale-110"
+          className="absolute top-2 right-2 w-7 h-7 bg-white/90 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200"
         >
           {isWishlisted ? (
-            <IoMdHeart className="text-red-500 text-base sm:text-lg" />
+            <IoMdHeart className="text-red-500 text-sm" />
           ) : (
-            <IoMdHeartEmpty className="text-gray-600 text-base sm:text-lg" />
+            <IoMdHeartEmpty className="text-gray-600 text-sm" />
           )}
         </button>
+
+        {/* Discount Badge */}
+        {showDiscount && product.discount && (
+          <div className="absolute top-2 left-2 bg-red-500 text-white text-xs px-2 py-1 rounded font-medium">
+            -{product.discount}%
+          </div>
+        )}
       </div>
 
       {/* Product Info */}
-      <div className="p-3 sm:p-4">
-        {product.category && (
-          <div className="text-[10px] sm:text-xs font-medium text-gray-400 uppercase tracking-wider mb-1">
-            {typeof product.category === "object"
-              ? product.category.name
-              : product.category}
-          </div>
-        )}
-        <h3 className="font-semibold text-gray-900 text-sm sm:text-base mb-2 line-clamp-2 leading-tight group-hover:text-accent transition-colors duration-200">
-          {product.title}
-        </h3>
-        <div className="flex items-center justify-between">
+      <div className="p-3 space-y-2">
+        <div>
+          <h3 className="font-medium text-gray-900 text-sm leading-tight line-clamp-2">
+            {product.title}
+          </h3>
+          {showSoldCount && product.sold_count && (
+            <div className="text-xs text-gray-500 mt-1">
+              {product.sold_count} terjual
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-1">
           <div className="flex items-center gap-2">
-            <span className="text-base sm:text-lg font-bold text-gray-900">
-              ${product.price}
+            <span className="font-bold text-base text-gray-900">
+              {formatCurrency(product.displayed_price_final || product.price)}
             </span>
+            {product.displayed_price_original > 0 && showOriginalPrice && (
+              <span className="text-xs text-gray-400 line-through">
+                {formatCurrency(product.displayed_price_original)}
+              </span>
+            )}
           </div>
+
+          {/* Rating - Only show for best sellers */}
+          {showRating && product.product_rating && (
+            <div className="flex items-center gap-1">
+              <div className="flex items-center">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <svg
+                    key={star}
+                    className={`w-3 h-3 ${
+                      star <= Math.floor(product.product_rating)
+                        ? "text-yellow-400 fill-current"
+                        : "text-gray-300 fill-current"
+                    }`}
+                    viewBox="0 0 20 20"
+                  >
+                    <path d="M10 15l-5.878 3.09 1.123-6.545L.489 6.91l6.572-.955L10 0l2.939 5.955 6.572.955-4.756 4.635 1.123 6.545z" />
+                  </svg>
+                ))}
+              </div>
+              <span className="text-xs text-gray-500">
+                ({product.product_rating})
+              </span>
+            </div>
+          )}
         </div>
       </div>
     </div>

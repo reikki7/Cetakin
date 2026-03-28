@@ -8,3 +8,7 @@
 @theme {
   --color-accent: #a4b39f;
 }
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}

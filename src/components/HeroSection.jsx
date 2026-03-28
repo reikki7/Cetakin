@@ -1,61 +1,63 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import heroImage1 from "../assets/HeroImage1.png";
 import heroImage2 from "../assets/HeroImage2.png";
 import heroImage3 from "../assets/HeroImage3.png";
 
-const slides = [
-  {
-    image: heroImage1,
-    title: (
-      <>
-        Desain Dengan
-        <br />
-        <span className="text-[#2F3E34]">Gaya</span>
-      </>
-    ),
-    description:
-      "Ciptakan produk khusus yang menakjubkan dengan layanan pencetakan dan desain premium kami.",
-    button: {
-      text: "Belanja Sekarang",
-      action: () => console.log("Belanja Sekarang"),
-    },
-  },
-  {
-    image: heroImage2,
-    title: (
-      <>
-        Kreasi Tanpa
-        <br />
-        <span className="text-[#2F3E34]">Batas</span>
-      </>
-    ),
-    description:
-      "Wujudkan ide kreatif Anda menjadi produk kerajinan unik dan aksesori kustom yang memukau dengan kualitas terbaik.",
-    button: {
-      text: "Mulai Berkreasi",
-      action: () => console.log("Mulai Berkreasi"),
-    },
-  },
-  {
-    image: heroImage3,
-    title: (
-      <>
-        Cetak Dengan
-        <br />
-        <span className="text-[#2F3E34]">Presisi</span>
-      </>
-    ),
-    description:
-      "Layanan pencetakan digital berkualitas tinggi untuk segala kebutuhan bisnis dan personal Anda dengan hasil yang sempurna.",
-    button: {
-      text: "Cetak Sekarang",
-      action: () => console.log("Cetak Sekarang"),
-    },
-  },
-];
-
 const HeroCarousel = () => {
   const [current, setCurrent] = useState(0);
+  const navigate = useNavigate();
+
+  const slides = [
+    {
+      image: heroImage1,
+      title: (
+        <>
+          Desain Dengan
+          <br />
+          <span className="text-[#2F3E34]">Gaya</span>
+        </>
+      ),
+      description:
+        "Ciptakan produk khusus yang menakjubkan dengan layanan pencetakan dan desain premium kami.",
+      button: {
+        text: "Belanja Sekarang",
+        action: () => navigate("/pakaian"),
+      },
+    },
+    {
+      image: heroImage2,
+      title: (
+        <>
+          Kreasi Tanpa
+          <br />
+          <span className="text-[#2F3E34]">Batas</span>
+        </>
+      ),
+      description:
+        "Wujudkan ide kreatif Anda menjadi produk kerajinan unik dan aksesori kustom yang memukau dengan kualitas terbaik.",
+      button: {
+        text: "Mulai Berkreasi",
+        action: () => navigate("/aksesori"),
+      },
+    },
+    {
+      image: heroImage3,
+      title: (
+        <>
+          Cetak Dengan
+          <br />
+          <span className="text-[#2F3E34]">Presisi</span>
+        </>
+      ),
+      description:
+        "Layanan pencetakan digital berkualitas tinggi untuk segala kebutuhan bisnis dan personal Anda dengan hasil yang sempurna.",
+      button: {
+        text: "Cetak Sekarang",
+        action: () => navigate("/dekorasi"),
+      },
+    },
+  ];
 
   useEffect(() => {
     const interval = setInterval(() => {
